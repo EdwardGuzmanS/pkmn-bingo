@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reglas — HeartGold Bingo</title>
+<link rel="stylesheet" href="../css/shared.css">
+<style>
+  body { background-image: radial-gradient(ellipse at 80% 20%, #00001a 0%, transparent 60%); }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .rule-card {
+    background: rgba(10,10,26,0.9);
+    border: 2px solid var(--border);
+    box-shadow: 3px 3px 0 var(--shadow);
+    padding: 18px;
+  }
+
+  .rule-card-title {
+    font-size: 9px;
+    color: var(--gold);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rule-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+  }
+
+  .rule-dot {
+    width: 6px; height: 6px;
+    background: var(--red);
+    border: 1px solid var(--dark-gold);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .rule-text {
+    font-size: 7px;
+    color: rgba(255,248,231,0.7);
+    line-height: 1.8;
+  }
+
+  /* Handicap section */
+  .handicap-section {
+    margin-top: 24px;
+    background: rgba(139,69,0,0.08);
+    border: 2px solid rgba(255,165,0,0.3);
+    box-shadow: 3px 3px 0 var(--shadow);
+    padding: 20px;
+  }
+
+  .handicap-title {
+    font-size: 10px;
+    color: orange;
+    margin-bottom: 6px;
+  }
+
+  .handicap-sub {
+    font-size: 7px;
+    color: rgba(255,165,0,0.5);
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+  }
+
+  .handicap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+  }
+
+  .handicap-item {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,165,0,0.2);
+    padding: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .handicap-icon { font-size: 18px; flex-shrink: 0; }
+
+  .handicap-text { font-size: 7px; color: rgba(255,248,231,0.6); line-height: 1.8; }
+  .handicap-text strong { color: orange; display: block; margin-bottom: 3px; }
+
+  /* Points table */
+  .points-table { width: 100%; border-collapse: separate; border-spacing: 0 3px; margin-top: 8px; }
+  .points-table th { font-size: 6px; color: rgba(255,248,231,0.4); text-align: left; padding: 6px 10px; letter-spacing: 1px; }
+  .points-table td { background: rgba(10,10,26,0.8); border: 1px solid var(--border); padding: 10px; font-size: 7px; }
+  .points-table td:first-child { color: var(--gold); }
+  .points-table td:last-child { color: rgba(255,248,231,0.6); }
+  .pts-val { color: var(--green) !important; font-family: 'VT323', monospace; font-size: 18px; }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html" class="nav-logo">🔴 HG BINGO</a>
+  <div class="nav-links">
+    <a href="bingo.html" class="nav-link">TABLERO</a>
+    <a href="ranking.html" class="nav-link">RANKING</a>
+    <a href="rules.html" class="nav-link active">REGLAS</a>
+    <a href="prizes.html" class="nav-link">PREMIOS</a>
+  </div>
+  <span class="nav-player" id="navPlayer">—</span>
+</nav>
+
+<div class="page-wrap">
+  <h2 class="section-heading">📋 REGLAS</h2>
+  <p class="section-sub">Reglamento oficial · Temporada 2025 · 4 Jugadores</p>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-card-title">🎯 OBJETIVO</div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Completa las 25 tareas del tablero jugando Pokémon HeartGold de forma independiente.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Gana quien acumule más puntos al finalizar el reto o quien complete el tablero entero primero.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">En caso de empate, gana quien haya completado más BINGOs (líneas). Si persiste, gana quien completó tareas antes cronológicamente.</div></div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-card-title">📅 INICIO Y DURACIÓN</div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Todos inician una partida nueva de HeartGold el mismo día acordado.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Está prohibido usar cheats, emulación con velocidad aumentada o save states externos.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Emuladores permitidos: melonDS y Delta para iOS únicamente.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">El reto termina cuando alguien complete el tablero completo, o al vencer la fecha límite acordada.</div></div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-card-title">✅ MARCAR TAREAS</div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Marca tus tareas directamente en el tablero de esta página.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Debes tener evidencia (screenshot o video) disponible si alguien la pide.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Si hay duda sobre si una tarea aplica, se vota: mayoría simple decide.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Si se comprueba trampa: –3 puntos y la tarea queda descalificada.</div></div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-card-title">📸 CHECK-INS</div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Check-in semanal obligatorio (videollamada o chat grupal) para reportar avances.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Se recomienda los domingos por la noche.</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">El anfitrión de cada check-in lleva snacks (rotativo).</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">La casilla ❤️ central es libre para todos desde el inicio.</div></div>
+    </div>
+  </div>
+
+  <!-- Handicap -->
+  <div class="handicap-section" style="margin-top:20px">
+    <div class="handicap-title">⚡ HANDICAP — JUGADOR AVANZADO</div>
+    <div class="handicap-sub">Aplica al jugador que ya tenía 12 tareas completadas al inicio del reto</div>
+    <div class="handicap-grid">
+      <div class="handicap-item">
+        <div class="handicap-icon">📉</div>
+        <div class="handicap-text"><strong>–5 puntos iniciales</strong>Empieza con penalización en el marcador general.</div>
+      </div>
+      <div class="handicap-item">
+        <div class="handicap-icon">🚫</div>
+        <div class="handicap-text"><strong>Sin Ultra Ball ni Master Ball</strong>No puede usarlas hasta completar la Liga de Johto.</div>
+      </div>
+      <div class="handicap-item">
+        <div class="handicap-icon">⏳</div>
+        <div class="handicap-text"><strong>Retraso de 1 día</strong>Sus tareas cuentan desde el día 2, no el día 1.</div>
+      </div>
+      <div class="handicap-item">
+        <div class="handicap-icon">🎯</div>
+        <div class="handicap-text"><strong>BINGO más difícil</strong>Sus líneas deben incluir al menos 1 tarea de columna B u O.</div>
+      </div>
+      <div class="handicap-item">
+        <div class="handicap-icon">🔄</div>
+        <div class="handicap-text"><strong>Parte desde cero</strong>Las 12 tareas previas no se transfieren al tablero compartido.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Points -->
+  <div style="margin-top:20px">
+    <h3 style="font-size:10px;color:var(--gold);margin-bottom:12px">🏅 PUNTUACIÓN</h3>
+    <table class="points-table">
+      <thead><tr><th>ACCIÓN</th><th>DETALLE</th><th>PTS</th></tr></thead>
+      <tbody>
+        <tr><td>Tarea completada</td><td>Cualquier casilla marcada</td><td class="pts-val">+1</td></tr>
+        <tr><td>BINGO (línea)</td><td>Fila, columna o diagonal completa</td><td class="pts-val">+3</td></tr>
+        <tr><td>Primero en completar</td><td>Tareas marcadas como "primero en..."</td><td class="pts-val">+2</td></tr>
+        <tr><td>Tablero completo</td><td>Las 25 tareas finalizadas</td><td class="pts-val">+10</td></tr>
+        <tr><td>✨ Shiny capturado</td><td>Bono especial</td><td class="pts-val">+3</td></tr>
+        <tr><td>🔴 Vencer a Red</td><td>Bono especial endgame</td><td class="pts-val">+5</td></tr>
+        <tr><td>🌸 Pokédex Nacional</td><td>Bono especial completista</td><td class="pts-val">+5</td></tr>
+        <tr><td>⚠️ Sin evidencia</td><td>Tarea reportada sin foto/video</td><td class="pts-val" style="color:#ff6666 !important">–1</td></tr>
+        <tr><td>⚠️ Trampa</td><td>Confirmada por votación</td><td class="pts-val" style="color:#ff6666 !important">–3</td></tr>
+        <tr><td>⚡ Handicap</td><td>Jugador avanzado al inicio</td><td class="pts-val" style="color:#ff6666 !important">–5</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.getElementById('navPlayer').textContent =
+    sessionStorage.getItem('player') ? '👤 ' + sessionStorage.getItem('player') : '—';
+</script>
+</body>
+</html>

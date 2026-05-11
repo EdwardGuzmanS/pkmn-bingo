@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking — HeartGold Bingo</title>
+<link rel="stylesheet" href="../css/shared.css">
+<style>
+  body {
+    background-image: radial-gradient(ellipse at 50% 0%, #1a0a00 0%, transparent 60%);
+  }
+
+  .podium-wrap {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    margin: 28px auto 32px;
+    max-width: 500px;
+    padding: 0 16px;
+  }
+
+  .podium-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .podium-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    border: 3px solid;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  }
+
+  .podium-name {
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    color: var(--cream);
+    text-align: center;
+  }
+
+  .podium-pts {
+    font-size: 7px;
+    color: rgba(255,248,231,0.5);
+    text-align: center;
+  }
+
+  .podium-block {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-family: 'VT323', monospace;
+    border: 2px solid;
+    box-shadow: 3px 3px 0 var(--shadow);
+    color: var(--cream);
+  }
+
+  .p1 .podium-avatar { border-color: var(--gold); background: rgba(255,215,0,0.1); }
+  .p1 .podium-block { height: 100px; background: linear-gradient(to bottom, rgba(255,215,0,0.15), rgba(255,215,0,0.05)); border-color: var(--gold); }
+
+  .p2 .podium-avatar { border-color: #C0C0C0; background: rgba(192,192,192,0.1); }
+  .p2 .podium-block { height: 70px; background: linear-gradient(to bottom, rgba(192,192,192,0.1), rgba(192,192,192,0.03)); border-color: #C0C0C0; }
+
+  .p3 .podium-avatar { border-color: #CD7F32; background: rgba(205,127,50,0.1); }
+  .p3 .podium-block { height: 50px; background: linear-gradient(to bottom, rgba(205,127,50,0.1), rgba(205,127,50,0.03)); border-color: #CD7F32; }
+
+  /* Full table */
+  .ranking-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    margin-top: 8px;
+  }
+
+  .ranking-table th {
+    font-size: 7px;
+    color: rgba(255,248,231,0.4);
+    text-align: left;
+    padding: 8px 12px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ranking-table th:last-child, .ranking-table td:last-child { text-align: right; }
+
+  .ranking-row td {
+    background: rgba(10,10,26,0.8);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 12px;
+    transition: background 0.15s;
+  }
+
+  .ranking-row td:first-child {
+    border-left: 1px solid var(--border);
+    border-radius: 0;
+  }
+
+  .ranking-row td:last-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .ranking-row:hover td { background: rgba(255,215,0,0.04); }
+
+  .ranking-row.me td { border-color: var(--green); }
+
+  .rank-pos {
+    font-family: 'VT323', monospace;
+    font-size: 22px;
+    color: rgba(255,248,231,0.3);
+    display: block;
+  }
+
+  .rank-pos.gold { color: var(--gold); }
+  .rank-pos.silver { color: #C0C0C0; }
+  .rank-pos.bronze { color: #CD7F32; }
+
+  .rank-name {
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    color: var(--cream);
+  }
+
+  .rank-name.me-label::after {
+    content: ' (tú)';
+    color: var(--green);
+    font-size: 14px;
+  }
+
+  .rank-pts {
+    font-size: 8px;
+    color: var(--gold);
+  }
+
+  .rank-bingos {
+    font-size: 7px;
+    color: rgba(255,248,231,0.5);
+  }
+
+  .mini-progress {
+    width: 80px;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  .mini-progress-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--red), var(--gold));
+  }
+
+  .handicap-tag {
+    display: inline-block;
+    background: rgba(255,165,0,0.15);
+    border: 1px solid rgba(255,165,0,0.4);
+    color: orange;
+    font-size: 5px;
+    padding: 2px 5px;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  .loading-msg {
+    text-align: center;
+    font-size: 8px;
+    color: rgba(255,248,231,0.3);
+    padding: 40px;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html" class="nav-logo">🔴 HG BINGO</a>
+  <div class="nav-links">
+    <a href="bingo.html" class="nav-link">TABLERO</a>
+    <a href="ranking.html" class="nav-link active">RANKING</a>
+    <a href="rules.html" class="nav-link">REGLAS</a>
+    <a href="prizes.html" class="nav-link">PREMIOS</a>
+  </div>
+  <span class="nav-player" id="navPlayer">—</span>
+</nav>
+
+<div class="page-wrap">
+  <h2 class="section-heading">🏆 RANKING</h2>
+  <p class="section-sub">Actualización en tiempo real · Temporada 2025</p>
+
+  <!-- Podium -->
+  <div class="podium-wrap" id="podium">
+    <div class="loading-msg">Cargando entrenadores...</div>
+  </div>
+
+  <!-- Full table -->
+  <div class="card">
+    <table class="ranking-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ENTRENADOR</th>
+          <th>PROGRESO</th>
+          <th>BINGOs</th>
+          <th>PTS</th>
+        </tr>
+      </thead>
+      <tbody id="rankingBody">
+        <tr><td colspan="5" class="loading-msg">Cargando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSOal28NySNl8WwIXXgE4rL0l4EsDVXl8",
+    authDomain: "pkmn-heartgold.firebaseapp.com",
+    projectId: "pkmn-heartgold",
+    storageBucket: "pkmn-heartgold.firebasestorage.app",
+    messagingSenderId: "100911488175",
+    appId: "1:100911488175:web:7b9798872692ced629885a"
+  };
+
+  const LINES = [
+    [0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24],
+    [0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],
+    [0,6,12,18,24],[4,8,12,16,20]
+  ];
+
+  const PODIUM_ICONS = ['🥇','🥈','🥉'];
+  const PODIUM_CLASSES = ['p1','p2','p3'];
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const me = sessionStorage.getItem('player') || '';
+
+  document.getElementById('navPlayer').textContent = me ? '👤 ' + me : '—';
+
+  function countBingos(marks) {
+    return LINES.filter(l => l.every(i => marks[i])).length;
+  }
+
+  onSnapshot(collection(db, 'players'), (snap) => {
+    const players = snap.docs.map(d => {
+      const data = d.data();
+      const marks = data.marks || new Array(25).fill(false);
+      const pts = marks.filter(Boolean).length;
+      const bingos = countBingos(marks);
+      return { name: data.name, pts, bingos, pct: Math.round((pts/25)*100) };
+    }).sort((a,b) => b.pts !== a.pts ? b.pts - a.pts : b.bingos - a.bingos);
+
+    // Podium
+    const podium = document.getElementById('podium');
+    if (players.length === 0) {
+      podium.innerHTML = '<div class="loading-msg">Nadie ha entrado aún</div>';
+    } else {
+      // reorder for display: 2nd, 1st, 3rd
+      const display = [players[1], players[0], players[2]].filter(Boolean);
+      const classMap = players[1] ? ['p2','p1','p3'] : ['p1','p3'];
+      podium.innerHTML = display.map((p, i) => {
+        const origIdx = players.indexOf(p);
+        const cls = PODIUM_CLASSES[origIdx] || 'p3';
+        return `
+          <div class="podium-col ${cls}">
+            <div class="podium-avatar">${PODIUM_ICONS[origIdx] || '🎮'}</div>
+            <div class="podium-name">${p.name}</div>
+            <div class="podium-pts">${p.pts} pts</div>
+            <div class="podium-block">${origIdx + 1}°</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Table
+    const body = document.getElementById('rankingBody');
+    if (players.length === 0) {
+      body.innerHTML = '<tr><td colspan="5" class="loading-msg">Sin jugadores aún</td></tr>';
+      return;
+    }
+
+    const posColors = ['gold','silver','bronze'];
+    body.innerHTML = players.map((p, i) => `
+      <tr class="ranking-row ${p.name === me ? 'me' : ''}">
+        <td><span class="rank-pos ${posColors[i] || ''}">${i+1}°</span></td>
+        <td>
+          <span class="rank-name ${p.name === me ? 'me-label' : ''}">${p.name}</span>
+        </td>
+        <td>
+          <div class="mini-progress"><div class="mini-progress-fill" style="width:${p.pct}%"></div></div>
+          <span style="font-size:11px;font-family:VT323,monospace;color:rgba(255,248,231,0.5)">${p.pts}/25</span>
+        </td>
+        <td class="rank-bingos">${p.bingos}</td>
+        <td class="rank-pts">${p.pts}</td>
+      </tr>
+    `).join('');
+  });
+</script>
+</body>
+</html>

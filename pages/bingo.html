@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero — HeartGold Bingo</title>
+<link rel="stylesheet" href="../css/shared.css">
+<style>
+  body {
+    background-image:
+      radial-gradient(ellipse at 10% 20%, #1a0505 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, #050510 0%, transparent 50%);
+  }
+
+  .bingo-header {
+    text-align: center;
+    padding: 20px 16px 0;
+  }
+
+  .player-badge {
+    display: inline-block;
+    background: var(--red);
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    font-size: 9px;
+    padding: 6px 14px;
+    margin-bottom: 10px;
+    box-shadow: 3px 3px 0 var(--shadow);
+  }
+
+  .save-status {
+    font-size: 6px;
+    color: rgba(255,248,231,0.35);
+    letter-spacing: 1px;
+    margin-top: 4px;
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+  }
+
+  /* BINGO grid */
+  .bingo-wrap {
+    max-width: 700px;
+    margin: 18px auto 0;
+    padding: 0 12px;
+  }
+
+  .bingo-letters {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 3px;
+    margin-bottom: 3px;
+  }
+
+  .bingo-letter {
+    background: var(--red);
+    border: 2px solid var(--dark-gold);
+    text-align: center;
+    padding: 10px 4px;
+    font-size: 16px;
+    color: var(--gold);
+    text-shadow: 2px 2px 0 var(--shadow);
+    box-shadow: 2px 2px 0 var(--shadow);
+  }
+
+  .bingo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 3px;
+  }
+
+  .cell {
+    background: rgba(10,10,26,0.95);
+    border: 2px solid var(--border);
+    padding: 10px 6px;
+    cursor: pointer;
+    transition: all 0.18s;
+    min-height: 95px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,215,0,0.03), transparent);
+    pointer-events: none;
+  }
+
+  .cell:hover:not(.free) {
+    border-color: var(--gold);
+    transform: translate(-1px,-1px);
+    box-shadow: 3px 3px 0 var(--shadow);
+  }
+
+  .cell.marked {
+    background: linear-gradient(135deg, rgba(0,70,0,0.95), rgba(0,40,0,0.95));
+    border-color: var(--green);
+    box-shadow: inset 0 0 20px rgba(46,204,64,0.1);
+  }
+
+  .cell.marked::after {
+    content: '✓';
+    position: absolute;
+    top: 3px; right: 5px;
+    color: var(--green);
+    font-size: 12px;
+    font-family: 'VT323', monospace;
+  }
+
+  .cell.free {
+    background: linear-gradient(135deg, rgba(0,40,80,0.95), rgba(0,20,50,0.95));
+    border-color: #0070C0;
+    cursor: default;
+  }
+
+  .cell.shiny-cell { border-color: #FF69B4; }
+  .cell.shiny-cell .cell-icon { animation: shimmer 1.5s ease-in-out infinite; }
+
+  @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  .cell-icon { font-size: 20px; line-height: 1; }
+
+  .cell-text {
+    font-size: 6px;
+    text-align: center;
+    color: var(--cream);
+    line-height: 1.6;
+  }
+
+  .cell.marked .cell-text { color: #aaffaa; }
+  .cell.free .cell-text { color: #88ccff; font-size: 7px; }
+
+  .cell-cat {
+    font-family: 'VT323', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    opacity: 0.6;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    max-width: 700px;
+    margin: 14px auto 0;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .progress-bar-outer {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(to right, var(--red), var(--gold));
+    transition: width 0.4s ease;
+  }
+
+  .progress-text {
+    font-size: 9px;
+    color: var(--gold);
+    white-space: nowrap;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+  }
+
+  .bingo-count {
+    font-size: 7px;
+    color: rgba(255,248,231,0.5);
+    white-space: nowrap;
+  }
+
+  /* Other players mini panel */
+  .others-wrap {
+    max-width: 700px;
+    margin: 14px auto 0;
+    padding: 0 12px 40px;
+  }
+
+  .others-title {
+    font-size: 7px;
+    color: rgba(255,248,231,0.35);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .others-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .other-card {
+    background: rgba(10,10,26,0.8);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    font-size: 7px;
+    min-width: 120px;
+    flex: 1;
+  }
+
+  .other-name {
+    color: var(--gold);
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .other-bar-outer {
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    margin-top: 4px;
+  }
+
+  .other-bar-inner {
+    height: 100%;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  .other-pts {
+    font-size: 6px;
+    color: rgba(255,248,231,0.4);
+    margin-top: 3px;
+    display: block;
+    font-family: 'VT323', monospace;
+    font-size: 13px;
+  }
+
+  /* Bingo celebration */
+  .bingo-toast {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) scale(0);
+    background: var(--dark-red);
+    border: 4px solid var(--gold);
+    padding: 28px 40px;
+    text-align: center;
+    z-index: 200;
+    box-shadow: 8px 8px 0 var(--shadow);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+  }
+
+  .bingo-toast.show { transform: translate(-50%,-50%) scale(1); pointer-events: all; }
+  .bingo-toast h2 { font-size: 36px; color: var(--gold); text-shadow: 3px 3px 0 var(--shadow); }
+  .bingo-toast p { font-size: 8px; color: #fff; margin: 10px 0 16px; }
+  .bingo-toast button {
+    background: var(--gold); border: none;
+    font-family: 'Press Start 2P', monospace; font-size: 8px;
+    padding: 10px 20px; cursor: pointer;
+    box-shadow: 3px 3px 0 var(--shadow); color: #000;
+  }
+
+  .confetti-container { position:fixed; inset:0; pointer-events:none; z-index:199; overflow:hidden; }
+  .confetti-dot { position:absolute; animation: fall 2s ease-in forwards; }
+  @keyframes fall {
+    from { transform: translateY(-10px) rotate(0deg); opacity:1; }
+    to { transform: translateY(100vh) rotate(720deg); opacity:0; }
+  }
+
+  @media (max-width: 480px) {
+    .cell { min-height: 72px; padding: 6px 3px; }
+    .cell-icon { font-size: 15px; }
+    .cell-text { font-size: 5px; }
+    .bingo-letter { font-size: 13px; padding: 8px 2px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html" class="nav-logo">🔴 HG BINGO</a>
+  <div class="nav-links">
+    <a href="bingo.html" class="nav-link active">TABLERO</a>
+    <a href="ranking.html" class="nav-link">RANKING</a>
+    <a href="rules.html" class="nav-link">REGLAS</a>
+    <a href="prizes.html" class="nav-link">PREMIOS</a>
+  </div>
+  <span class="nav-player" id="navPlayer">—</span>
+</nav>
+
+<div class="bingo-header">
+  <div class="player-badge" id="playerBadge">CARGANDO...</div>
+  <div class="save-status" id="saveStatus">☁️ Conectando...</div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar-outer">
+    <div class="progress-bar-inner" id="progressBar" style="width:0%"></div>
+  </div>
+  <span class="progress-text" id="progressText">0/25</span>
+  <span class="bingo-count" id="bingoCount">0 BINGOs</span>
+</div>
+
+<div class="bingo-wrap">
+  <div class="bingo-letters">
+    <div class="bingo-letter">B</div>
+    <div class="bingo-letter">I</div>
+    <div class="bingo-letter">N</div>
+    <div class="bingo-letter">G</div>
+    <div class="bingo-letter">O</div>
+  </div>
+  <div class="bingo-grid" id="bingoGrid"></div>
+</div>
+
+<div class="others-wrap">
+  <p class="others-title">OTROS ENTRENADORES</p>
+  <div class="others-grid" id="othersGrid"></div>
+</div>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<div class="bingo-toast" id="bingoToast">
+  <h2>¡BINGO!</h2>
+  <p id="bingoMsg">¡Completaste una línea!</p>
+  <button onclick="document.getElementById('bingoToast').classList.remove('show')">¡GENIAL!</button>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSOal28NySNl8WwIXXgE4rL0l4EsDVXl8",
+    authDomain: "pkmn-heartgold.firebaseapp.com",
+    projectId: "pkmn-heartgold",
+    storageBucket: "pkmn-heartgold.firebasestorage.app",
+    messagingSenderId: "100911488175",
+    appId: "1:100911488175:web:7b9798872692ced629885a"
+  };
+
+  const TASKS = [
+    { icon: "✨", text: "Atrapa un Pokémon shiny salvaje", cat: "Shiny", shiny: true },
+    { icon: "🏆", text: "Vence a los 8 líderes de Johto", cat: "Liga" },
+    { icon: "🥚", text: "Obtén tu primer huevo en el Guardería", cat: "Crianza" },
+    { icon: "💰", text: "Acumula ₽99,999 en dinero", cat: "Coleccionista" },
+    { icon: "🌊", text: "Completa la ruta de surf hasta Isla Canela", cat: "Exploración" },
+    { icon: "🦊", text: "Evoluciona a tu Pokémon inicial", cat: "Evolución" },
+    { icon: "📱", text: "Intercambia números con 10 entrenadores", cat: "Social" },
+    { icon: "🎰", text: "Consigue la MT Rayo en el Casino de Ciudad Trigal", cat: "Especial" },
+    { icon: "🍃", text: "Derrota a un entrenador solo con el starter", cat: "Reto" },
+    { icon: "🌙", text: "Atrapa un Pokémon en la Torre Oculta", cat: "Especial" },
+    { icon: "🌿", text: "Completa la Pokédex de Johto (160)", cat: "Pokédex" },
+    { icon: "🎵", text: "Usa el PokeFlute para despertar a Snorlax", cat: "Historia" },
+    { free: true, icon: "❤️", text: "CASILLA LIBRE", cat: "FREE" },
+    { icon: "🏅", text: "Completa la Liga Pokémon (E4 + Campeón)", cat: "Liga" },
+    { icon: "🌺", text: "Atrapa los 3 perros legendarios", cat: "Legendario" },
+    { icon: "🎒", text: "Llena tu caja PC con 50 Pokémon", cat: "Coleccionista" },
+    { icon: "🤝", text: "Vence a tu rival 3 veces", cat: "Rival" },
+    { icon: "💊", text: "Usa 20 Pociones en una partida", cat: "Supervivencia" },
+    { icon: "🐉", text: "Obtén el obsequio del Dratini en Ciudad Endrino", cat: "Historia" },
+    { icon: "🏄", text: "Aprende Corte, Surf, Vuelo, Fuerza y Cascada", cat: "MO" },
+    { icon: "🔴", text: "Vence a Red en la cima del Monte Plata", cat: "Endgame" },
+    { icon: "🃏", text: "Consigue 30 puntos en la Tarjeta Azul del programa de Buena", cat: "Especial" },
+    { icon: "🐲", text: "Atrapa los 4 pseudolegendarios: Dragonite, Tyranitar, Salamence y Metagross", cat: "Coleccionista" },
+    { icon: "⚔️", text: "Vence a los 16 líderes (Johto + Kanto)", cat: "Liga" },
+    { icon: "🌸", text: "Completa el Pokédex Nacional (251+)", cat: "Pokédex" },
+  ];
+
+  const LINES = [
+    [0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24],
+    [0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],
+    [0,6,12,18,24],[4,8,12,16,20]
+  ];
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const playerName = sessionStorage.getItem('player');
+  if (!playerName) { window.location.href = '../index.html'; }
+
+  document.getElementById('navPlayer').textContent = '👤 ' + playerName;
+  document.getElementById('playerBadge').textContent = '🎮 ' + playerName;
+
+  let marks = new Array(25).fill(false);
+  let saveTimeout = null;
+  let prevBingos = 0;
+
+  function countBingos(m) {
+    return LINES.filter(line => line.every(i => m[i])).length;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('bingoGrid');
+    grid.innerHTML = '';
+    TASKS.forEach((task, i) => {
+      const cell = document.createElement('div');
+      const isMarked = marks[i];
+      cell.className = 'cell'
+        + (task.free ? ' free' : '')
+        + (isMarked && !task.free ? ' marked' : '')
+        + (task.shiny ? ' shiny-cell' : '');
+      cell.innerHTML = `
+        <div class="cell-icon">${task.icon}</div>
+        <div class="cell-text">${task.text}</div>
+        <div class="cell-cat">${task.cat}</div>
+      `;
+      if (!task.free) cell.onclick = () => toggleCell(i);
+      grid.appendChild(cell);
+    });
+
+    const done = marks.filter(Boolean).length;
+    const pct = Math.round((done / 25) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = done + '/25';
+    const bingos = countBingos(marks);
+    document.getElementById('bingoCount').textContent = bingos + (bingos === 1 ? ' BINGO' : ' BINGOs');
+  }
+
+  function toggleCell(i) {
+    marks[i] = !marks[i];
+    if (TASKS[i].free) return;
+    renderGrid();
+    scheduleSave();
+
+    const newBingos = countBingos(marks);
+    if (newBingos > prevBingos) {
+      prevBingos = newBingos;
+      showBingoCelebration();
+    }
+  }
+
+  function scheduleSave() {
+    clearTimeout(saveTimeout);
+    document.getElementById('saveStatus').textContent = '💾 Guardando...';
+    saveTimeout = setTimeout(async () => {
+      try {
+        await updateDoc(doc(db, 'players', playerName), { marks });
+        const now = new Date();
+        document.getElementById('saveStatus').textContent =
+          '✅ Guardado ' + now.toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit'});
+      } catch(e) {
+        document.getElementById('saveStatus').textContent = '⚠️ Error al guardar';
+      }
+    }, 900);
+  }
+
+  function showBingoCelebration() {
+    document.getElementById('bingoMsg').textContent = '¡' + playerName + ' completó una línea!';
+    document.getElementById('bingoToast').classList.add('show');
+    spawnConfetti();
+  }
+
+  function spawnConfetti() {
+    const c = document.getElementById('confettiContainer');
+    const colors = ['#FFD700','#CC0000','#2ECC40','#FF69B4','#fff','#0070C0'];
+    for (let i = 0; i < 70; i++) {
+      setTimeout(() => {
+        const d = document.createElement('div');
+        d.className = 'confetti-dot';
+        const size = 5 + Math.random() * 8;
+        d.style.cssText = `left:${Math.random()*100}%;top:-10px;width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*0.5}s;animation-duration:${1.5+Math.random()}s;`;
+        c.appendChild(d);
+        setTimeout(() => d.remove(), 2500);
+      }, i * 20);
+    }
+  }
+
+  // Live listener — my data
+  onSnapshot(doc(db, 'players', playerName), (snap) => {
+    if (snap.exists()) {
+      marks = snap.data().marks || new Array(25).fill(false);
+      marks[12] = true; // casilla libre
+      prevBingos = countBingos(marks);
+      renderGrid();
+      document.getElementById('saveStatus').textContent = '☁️ En vivo';
+    }
+  });
+
+  // Live listener — other players
+  onSnapshot(collection(db, 'players'), (snap) => {
+    const grid = document.getElementById('othersGrid');
+    const others = snap.docs.filter(d => d.id !== playerName);
+    if (others.length === 0) {
+      grid.innerHTML = '<span style="font-size:12px;font-family:VT323,monospace;color:rgba(255,248,231,0.3)">Nadie más ha entrado aún</span>';
+      return;
+    }
+    grid.innerHTML = others.map(d => {
+      const data = d.data();
+      const pts = (data.marks || []).filter(Boolean).length;
+      const pct = Math.round((pts / 25) * 100);
+      const bingos = countBingos(data.marks || []);
+      return `
+        <div class="other-card">
+          <span class="other-name">${data.name}</span>
+          <div class="other-bar-outer"><div class="other-bar-inner" style="width:${pct}%"></div></div>
+          <span class="other-pts">${pts}/25 tareas · ${bingos} BINGOs</span>
+        </div>
+      `;
+    }).join('');
+  });
+</script>
+</body>
+</html>

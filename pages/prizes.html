@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premios — HeartGold Bingo</title>
+<link rel="stylesheet" href="../css/shared.css">
+<style>
+  body { background-image: radial-gradient(ellipse at 50% 100%, #1a0a00 0%, transparent 60%); }
+
+  .prizes-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .prize-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0;
+    border: 2px solid;
+    box-shadow: 4px 4px 0 var(--shadow);
+    overflow: hidden;
+    transition: transform 0.15s;
+  }
+
+  .prize-card:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--shadow); }
+
+  .prize-pos {
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 80px;
+  }
+
+  .prize-pos-num {
+    font-family: 'VT323', monospace;
+    font-size: 42px;
+    line-height: 1;
+  }
+
+  .prize-pos-label {
+    font-size: 6px;
+    letter-spacing: 1px;
+    opacity: 0.7;
+  }
+
+  .prize-body {
+    padding: 16px 18px;
+    background: rgba(10,10,26,0.9);
+  }
+
+  .prize-title {
+    font-size: 9px;
+    margin-bottom: 4px;
+  }
+
+  .prize-subtitle {
+    font-size: 7px;
+    color: rgba(255,248,231,0.4);
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+
+  .prize-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .prize-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .prize-option-icon { font-size: 18px; flex-shrink: 0; }
+
+  .prize-option-text { font-size: 7px; color: rgba(255,248,231,0.7); line-height: 1.7; }
+  .prize-option-label { font-size: 6px; color: rgba(255,248,231,0.35); letter-spacing: 1px; display: block; margin-bottom: 2px; }
+
+  /* Colors per position */
+  .pos-1 { border-color: var(--gold); }
+  .pos-1 .prize-pos { background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(184,134,11,0.1)); border-right: 2px solid var(--gold); }
+  .pos-1 .prize-pos-num { color: var(--gold); }
+  .pos-1 .prize-title { color: var(--gold); }
+
+  .pos-2 { border-color: #A8A9AD; }
+  .pos-2 .prize-pos { background: linear-gradient(135deg, rgba(168,169,173,0.15), rgba(168,169,173,0.05)); border-right: 2px solid #A8A9AD; }
+  .pos-2 .prize-pos-num { color: #C0C0C0; }
+  .pos-2 .prize-title { color: #C0C0C0; }
+
+  .pos-3 { border-color: #CD7F32; }
+  .pos-3 .prize-pos { background: linear-gradient(135deg, rgba(205,127,50,0.15), rgba(205,127,50,0.05)); border-right: 2px solid #CD7F32; }
+  .pos-3 .prize-pos-num { color: #CD7F32; }
+  .pos-3 .prize-title { color: #CD7F32; }
+
+  .pos-last { border-color: rgba(200,50,50,0.5); }
+  .pos-last .prize-pos { background: linear-gradient(135deg, rgba(139,0,0,0.2), rgba(80,0,0,0.1)); border-right: 2px solid rgba(200,50,50,0.5); }
+  .pos-last .prize-pos-num { color: #ff4444; font-size: 30px; }
+  .pos-last .prize-title { color: #ff4444; }
+
+  /* Punishment castigo special */
+  .punishment-option {
+    background: rgba(139,0,0,0.1) !important;
+    border-color: rgba(200,50,50,0.2) !important;
+  }
+
+  .punishment-option .prize-option-text { color: #ff8888; }
+
+  /* Note */
+  .prize-note {
+    margin-top: 20px;
+    background: rgba(255,215,0,0.04);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-left: 3px solid var(--dark-gold);
+    padding: 14px 16px;
+    font-size: 7px;
+    color: rgba(255,248,231,0.5);
+    line-height: 1.8;
+  }
+
+  .prize-note strong { color: var(--gold); display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html" class="nav-logo">🔴 HG BINGO</a>
+  <div class="nav-links">
+    <a href="bingo.html" class="nav-link">TABLERO</a>
+    <a href="ranking.html" class="nav-link">RANKING</a>
+    <a href="rules.html" class="nav-link">REGLAS</a>
+    <a href="prizes.html" class="nav-link active">PREMIOS</a>
+  </div>
+  <span class="nav-player" id="navPlayer">—</span>
+</nav>
+
+<div class="page-wrap">
+  <h2 class="section-heading">🎁 PREMIOS</h2>
+  <p class="section-sub">Al finalizar el reto · Temporada 2025</p>
+
+  <div class="prizes-grid">
+
+    <!-- 1° -->
+    <div class="prize-card pos-1">
+      <div class="prize-pos">
+        <span class="prize-pos-num">1°</span>
+        <span class="prize-pos-label">CAMPEÓN</span>
+      </div>
+      <div class="prize-body">
+        <div class="prize-title">🥇 PRIMER LUGAR</div>
+        <div class="prize-subtitle">CAMPEÓN POKÉMON</div>
+        <div class="prize-options">
+          <div class="prize-option">
+            <div class="prize-option-icon">🍺</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">OPCIÓN CERVEZAS</span>
+              Pack artesanal 6-pack a elección del ganador
+            </div>
+          </div>
+          <div class="prize-option">
+            <div class="prize-option-icon">🃏</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">OPCIÓN POKÉMON TCG</span>
+              Booster pack Pokémon TCG + snack de su elección
+            </div>
+          </div>
+          <div class="prize-option">
+            <div class="prize-option-icon">⭐</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">BONO CAMPEÓN</span>
+              Elige el starter del próximo juego grupal
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2° -->
+    <div class="prize-card pos-2">
+      <div class="prize-pos">
+        <span class="prize-pos-num">2°</span>
+        <span class="prize-pos-label">ELITE FOUR</span>
+      </div>
+      <div class="prize-body">
+        <div class="prize-title">🥈 SEGUNDO LUGAR</div>
+        <div class="prize-subtitle">ELITE FOUR</div>
+        <div class="prize-options">
+          <div class="prize-option">
+            <div class="prize-option-icon">🍺</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">OPCIÓN CERVEZAS</span>
+              Figura mini Pokémon + 2 cervezas a elección
+            </div>
+          </div>
+          <div class="prize-option">
+            <div class="prize-option-icon">🃏</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">OPCIÓN POKÉMON TCG</span>
+              2 booster packs Pokémon TCG
+            </div>
+          </div>
+          <div class="prize-option">
+            <div class="prize-option-icon">🎬</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">BONO</span>
+              Elige la película Pokémon de la noche de cierre
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3° -->
+    <div class="prize-card pos-3">
+      <div class="prize-pos">
+        <span class="prize-pos-num">3°</span>
+        <span class="prize-pos-label">LÍDER GYM</span>
+      </div>
+      <div class="prize-body">
+        <div class="prize-title">🥉 TERCER LUGAR</div>
+        <div class="prize-subtitle">LÍDER DE GIMNASIO</div>
+        <div class="prize-options">
+          <div class="prize-option">
+            <div class="prize-option-icon">🍺</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">OPCIÓN CERVEZAS</span>
+              Stickers/pins Pokémon + 1 cerveza individual
+            </div>
+          </div>
+          <div class="prize-option">
+            <div class="prize-option-icon">🃏</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">OPCIÓN POKÉMON TCG</span>
+              1 booster pack Pokémon TCG
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Último -->
+    <div class="prize-card pos-last">
+      <div class="prize-pos">
+        <span class="prize-pos-num" style="font-size:24px">💀</span>
+        <span class="prize-pos-label">ÚLTIMO</span>
+      </div>
+      <div class="prize-body">
+        <div class="prize-title">EL PERDEDOR</div>
+        <div class="prize-subtitle">EL GRUPO VOTA EL CASTIGO</div>
+        <div class="prize-options">
+          <div class="prize-option punishment-option">
+            <div class="prize-option-icon">🍺</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">CASTIGO A</span>
+              Paga la ronda del campeón 😈
+            </div>
+          </div>
+          <div class="prize-option punishment-option">
+            <div class="prize-option-icon">🖨️</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">CASTIGO B</span>
+              Imprime y enmarca su Pokédex incompleta
+            </div>
+          </div>
+          <div class="prize-option punishment-option">
+            <div class="prize-option-icon">🐉</div>
+            <div class="prize-option-text">
+              <span class="prize-option-label">CASTIGO C</span>
+              Captura y entrega un Pokémon distinto a cada uno de los otros jugadores, el que cada uno elija
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="prize-note">
+    <strong>💡 NOTA SOBRE LOS PREMIOS</strong>
+    Los premios se financian con un fondo común acordado al inicio del reto. En caso de empate en puntos, se desempata por cantidad de BINGOs completados. Si persiste el empate, gana quien completó más tareas antes cronológicamente.
+  </div>
+</div>
+
+<script>
+  document.getElementById('navPlayer').textContent =
+    sessionStorage.getItem('player') ? '👤 ' + sessionStorage.getItem('player') : '—';
+</script>
+</body>
+</html>
